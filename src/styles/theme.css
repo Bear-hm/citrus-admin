@@ -1,0 +1,226 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* 品牌主色 */
+  --color-primary: #f97316;
+  --color-primary-hover: #ea580c;
+  --color-accent: #eab308;
+  --gradient-accent: linear-gradient(135deg, #f97316 0%, #eab308 100%);
+
+  /* Element 与历史变量对齐 */
+  --primary-color: #f97316;
+  --primary-light-3: #fdba74;
+  --primary-light-5: #fed7aa;
+  --primary-light-7: #ffedd5;
+  --primary-light-9: #fff7ed;
+  --primary-dark-2: #ea580c;
+
+  /* 文案 */
+  --text-primary: #374151;
+  --text-title: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  /* 背景 */
+  --background-page: #ffffff;
+  --background-subtle: #fff7ed;
+  --background-gray: #f3f4f6;
+
+  --success-color: #4caf50;
+  --warning-color: #eab308;
+  --danger-color: #f44336;
+}
+
+html {
+  height: 100%;
+  font-size: 14px;
+}
+
+body {
+  height: 100%;
+  color: var(--text-primary);
+  min-width: 1000px;
+  font-size: 14px;
+  line-height: 1.6;
+  font-family: "Microsoft YaHei", "PingFang SC", "Avenir", "Segoe UI",
+    "Hiragino Sans GB", "STHeiti", "Microsoft Sans Serif",
+    "WenQuanYi Micro Hei", sans-serif;
+  background-color: var(--background-page);
+  transition: background-color 0.3s ease;
+}
+
+body,
+ul,
+h1,
+h3,
+h4,
+p,
+dl,
+dd {
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--text-primary);
+  outline: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+i {
+  font-style: normal;
+}
+
+input[type="text"],
+input[type="search"],
+input[type="password"],
+input[type="checkbox"] {
+  padding: 0;
+  outline: none;
+  border: none;
+  -webkit-appearance: none;
+  &::placeholder {
+    color: var(--text-tertiary);
+  }
+}
+
+img {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
+}
+
+ul {
+  list-style: none;
+}
+
+#app {
+  background: var(--background-page);
+}
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  position: relative;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.ellipsis-2 {
+  word-break: break-all;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.clearfix:after {
+  content: ".";
+  display: block;
+  visibility: hidden;
+  height: 0;
+  line-height: 0;
+  clear: both;
+}
+
+/* Element Plus 组件样式优化 */
+.el-breadcrumb__inner.is-link {
+  font-weight: 400 !important;
+  color: var(--text-secondary) !important;
+}
+
+.el-breadcrumb__inner.is-link:hover {
+  color: var(--color-primary-hover) !important;
+}
+
+/* 分页器样式 */
+.pagination-bar {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 按钮样式优化 */
+.el-button--primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: var(--primary-dark-2);
+  border-color: var(--primary-dark-2);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+
+/* 卡片样式优化 */
+.el-card {
+  border-radius: 8px;
+  transition: box-shadow 0.2s ease;
+  border: none;
+  box-shadow: 0 2px 12px 0 rgba(17, 24, 39, 0.06);
+  background-color: var(--background-page);
+}
+
+.el-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(17, 24, 39, 0.1);
+}
+
+/* 输入框样式优化 */
+.el-input__inner:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+}
+
+/* 表格样式优化 */
+.el-table {
+  background-color: var(--background-page);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.el-table th {
+  background-color: var(--primary-light-9);
+  color: var(--text-title);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.el-table td {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.el-table--striped .el-table__body tr.el-table__row--striped td {
+  background-color: var(--primary-light-9);
+}
+
+.el-table__row:hover > td {
+  background-color: var(--primary-light-7) !important;
+}

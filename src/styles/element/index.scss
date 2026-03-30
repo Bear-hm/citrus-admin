@@ -1,0 +1,44 @@
+// 柑橘主题 — 与 src/styles/theme.css 变量一致
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': #f97316,
+      'light-3': #fdba74,
+      'light-5': #fed7aa,
+      'light-7': #ffedd5,
+      'light-9': #fff7ed,
+      'dark-2': #ea580c
+    ),
+    'success': (
+      'base': #4caf50,
+    ),
+    'warning': (
+      'base': #eab308,
+    ),
+    'danger': (
+      'base': #f44336,
+    ),
+    'info': (
+      'base': #6b7280,
+    ),
+  ),
+  $button-padding-horizontal: (
+    'default': 20px,
+  ),
+  $border-radius: (
+    'base': 6px,
+    'small': 4px,
+    'round': 20px,
+    'circle': 100%,
+  ),
+  $font-size: (
+    'extra-large': 20px,
+    'large': 18px,
+    'medium': 16px,
+    'base': 14px,
+    'small': 13px,
+    'extra-small': 12px,
+  )
+);
+
+@use "element-plus/theme-chalk/src/index.scss" as *;
