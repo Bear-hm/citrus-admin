@@ -35,17 +35,21 @@
     "@tsconfig/node18": "^2.0.1",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^18.16.19",
-    "@vitejs/plugin-vue": "^4.2.3",
+    "@vitejs/plugin-vue": "^5.0.0",
     "@vue/eslint-config-prettier": "^7.1.0",
     "@vue/eslint-config-typescript": "^11.0.3",
     "@vue/tsconfig": "^0.4.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8.47.0",
     "eslint-plugin-vue": "^9.11.0",
     "less-loader": "^11.1.3",
     "npm-run-all": "^4.1.5",
+    "postcss": "^8.5.6",
     "prettier": "^2.8.8",
+    "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "1.0.7",
     "typescript": "~5.0.4",
-    "vite": "^4.3.9",
+    "vite": "^5.2.0",
     "vue-tsc": "^1.6.5"
   }
 }
