@@ -1,12 +1,9 @@
 <template>
   <template v-for="menu in menuList" :key="menu.path">
+    <!-- 无子菜单的菜单项 -->
     <template v-if="!menu.children">
-      <el-menu-item
-        :index="menu.path"
-        v-if="!menu.meta?.hidden"
-        style="padding-left: 20px; color: #ffffff"
-      >
-        <el-icon v-if="menu.meta?.icon">
+      <el-menu-item :index="menu.path" v-if="!menu.meta?.hidden" class="menu-item">
+        <el-icon v-if="menu.meta?.icon" class="menu-icon">
           <component :is="menu.meta.icon"></component>
         </el-icon>
         <template #title>
@@ -15,13 +12,14 @@
       </el-menu-item>
     </template>
 
+    <!-- 只有一个子菜单 -->
     <template v-if="menu.children && menu.children.length === 1">
       <el-menu-item
         :index="resolveMenuIndex(menu.path, menu.children[0].path)"
         v-if="!menu.children[0].meta?.hidden"
-        style="padding-left: 20px; color: #ffffff"
+        class="menu-item"
       >
-        <el-icon v-if="menu.children[0].meta?.icon">
+        <el-icon v-if="menu.children[0].meta?.icon" class="menu-icon">
           <component :is="menu.children[0].meta.icon"></component>
         </el-icon>
         <template #title>
@@ -30,14 +28,14 @@
       </el-menu-item>
     </template>
 
+    <!-- 多子菜单 -->
     <el-sub-menu
       v-if="menu.children && menu.children.length > 1"
       :index="menu.path"
-      style="padding-left: 0"
       popper-append-to-body
     >
       <template #title>
-        <el-icon v-if="menu.meta?.icon">
+        <el-icon v-if="menu.meta?.icon" class="menu-icon">
           <component :is="menu.meta.icon"></component>
         </el-icon>
         <span>{{ menu.meta?.title }}</span>
@@ -46,9 +44,9 @@
         <el-menu-item
           :index="resolveMenuIndex(menu.path, child.path)"
           v-if="!child.meta?.hidden"
-          style="padding-left: 40px"
+          class="menu-item menu-item--child"
         >
-          <el-icon v-if="child.meta?.icon">
+          <el-icon v-if="child.meta?.icon" class="menu-icon">
             <component :is="child.meta.icon"></component>
           </el-icon>
           <template #title>
@@ -89,46 +87,51 @@ const resolveMenuIndex = (parentPath: string, childPath?: string) => {
 </script>
 
 <style lang="scss" scoped>
-$hover-bg: rgba(249, 115, 22, 0.18);
-$active-gradient: linear-gradient(135deg, #f97316 0%, #eab308 100%);
+$hover-bg: rgba(255, 255, 255, 0.06);
+$active-left-border: #f97316;
 
-.el-menu-item {
+// 通用菜单项样式
+.menu-item {
   background-color: transparent !important;
-  margin: 4px 8px;
+  margin: 2px 8px;
   border-radius: 8px;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
+  border-left: 3px solid transparent;
+  padding-left: 16px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-.el-menu-item.is-active {
-  color: #ffffff !important;
-  background: $active-gradient !important;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-}
+  &:hover {
+    background: $hover-bg !important;
+    border-left-color: rgba(249, 115, 22, 0.5);
+    transform: translateX(2px);
+  }
 
-.el-sub-menu__title {
-  color: rgba(255, 255, 255, 0.92) !important;
-  padding-left: 20px !important;
-}
-
-:deep(.el-sub-menu .el-menu) {
-  background-color: transparent !important;
-  .el-menu-item {
-    padding-left: 40px !important;
+  &.is-active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.15) 0%, rgba(234, 179, 8, 0.1) 100%) !important;
+    border-left: 4px solid $active-left-border;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+    transform: translateX(2px);
   }
 }
 
-:deep(.el-menu--collapse) {
-  .el-sub-menu__title {
-    padding-left: 20px !important;
-  }
+// 子菜单项缩进
+.menu-item--child {
+  padding-left: 36px !important;
 }
 
-.el-menu-item:hover {
-  background: $hover-bg !important;
-  border-radius: 8px !important;
-  transition: background-color 0.2s ease;
+// 图标对齐
+.menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  font-size: 18px;
 }
 
+// 内联菜单背景
 :deep(.el-menu--inline) {
   background-color: transparent !important;
 }

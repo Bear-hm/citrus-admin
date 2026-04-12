@@ -1,7 +1,15 @@
+/*
+ * @Author: xiong x1253780359@outlook.com
+ * @Date: 2025-10-10 08:42:07
+ * @LastEditors: xiong x1253780359@outlook.com
+ * @LastEditTime: 2026-04-12 17:27:54
+ * @FilePath: \citrus\citrus-admin\src\utils\request.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import axios from "axios";
 import { ElMessage } from "element-plus";
 const request = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: 'http://localhost:8080/api',
   timeout: 60000, // 请求超时时间
 });
 

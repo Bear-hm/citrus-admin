@@ -1,5 +1,4 @@
 import Layout from "@/layout/index.vue";
-import path from "path";
 export const constantRoute = [
   {
     path: "/navigation",
@@ -12,7 +11,6 @@ export const constantRoute = [
   {
     path: "/",
     component: Layout,
-    // redirect: "crawler/crawler-info",
     children: [
       {
         path: "",
@@ -25,79 +23,83 @@ export const constantRoute = [
       },
     ],
   },
+  // 资讯管理模块
   {
-    path: "/crawler",
+    path: "/content",
     component: Layout,
+    redirect: "/content/news",
     meta: {
-      title: "爬虫管理",
+      title: "资讯管理",
       hidden: false,
-      icon: "Aim",
+      icon: "Document",
     },
     children: [
       {
-        path: "crawler-info",
-        component: () => import("@/views/crawler/info/index.vue"),
-        name: "crawler-info",
+        path: "news",
+        component: () => import("@/views/content/news/index.vue"),
+        name: "news",
         meta: {
-          title: "新闻管理",
+          title: "资讯信息",
           hidden: false,
-          icon: "ChatLineSquare",
-        },
-      },
-      // {
-      //   path: "crawler-weather",
-      //   component: () => import("@/views/crawler/weather/index.vue"),
-      //   name: "天气管理",
-      //   meta: {
-      //     title: "天气管理",
-      //     hidden: false,
-      //     icon: "Sunny",
-      //   },
-      // },
-      // {
-      //   path: "crawler-price",
-      //   component: () => import("@/views/crawler/price/index.vue"),
-      //   name: "价格管理",
-      //   meta: {
-      //     title: "价格管理",
-      //     hidden: false,
-      //     icon: "Money",
-      //   },
-      // },
-      // {
-      //   path: "crawler-procure",
-      //   component: () => import("@/views/crawler/procure/index.vue"),
-      //   name: "采购管理",
-      //   meta: {
-      //     title: "采购管理",
-      //     hidden: false,
-      //     icon: "ShoppingCart",
-      //   },
-      // },
-    ],
-  },
-  {
-    path: "/carousel",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        component: () => import("@/views/carousel/index.vue"),
-        meta: {
-          title: "轮播图管理",
-          hidden: false,
-          icon: "Picture",
         },
       },
     ],
   },
+  // 首页模块
   {
-    path: "/user",
+    path: "/agri",
     component: Layout,
+    redirect: "/agri/weather",
+    meta: {
+      title: "农业资讯",
+      hidden: false,
+      icon: "Sunny",
+    },
     children: [
       {
-        path: "",
-        component: () => import("@/views/user/index.vue"),
+        path: "weather",
+        component: () => import("@/views/agri/weather/index.vue"),
+        name: "weather",
+        meta: {
+          title: "天气管理",
+          hidden: false,
+        },
+      },
+      {
+        path: "faq",
+        component: () => import("@/views/agri/faq/index.vue"),
+        name: "faq",
+        meta: {
+          title: "问答管理",
+          hidden: false,
+        },
+      },
+    ],
+  },
+  // 设置
+  {
+    path: "/setting",
+    component: Layout,
+    meta: {
+      title: "系统管理",
+      hidden: false,
+      icon: "Sunny",
+    },
+    children: [
+      {
+        path: "personal",
+        component: () => import("@/views/setting/personal/index.vue"),
+        name: "personal",
+        meta: {
+          title: "个人信息",
+          hidden: false,
+          icon: "User",
+        },
+      },
+      {
+        path: "user",
+        component: () => import("@/views/setting/user/index.vue"),
+        name: "user",
         meta: {
           title: "用户管理",
           hidden: false,
@@ -107,86 +109,11 @@ export const constantRoute = [
     ],
   },
   {
-    path: "/expert",
-    component: Layout,
-    children: [
-      {
-        path: "",
-        component: () => import("@/views/expert/index.vue"),
-        meta: {
-          title: "专家管理",
-          hidden: false,
-          icon: "Odometer",
-        },
-      },
-    ],
-  },
-  // {
-  //   path: "/problem",
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "problem",
-  //       component: () => import("@/views/fqa/index.vue"),
-  //       name: "problem",
-  //       meta: {
-  //         title: "问答管理",
-  //         hidden: false,
-  //         icon: "User",
-  //       },
-  //     },
-  //   ],
-
-  // },
-  // {
-  //   path: "/forum",
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "",
-  //       component: () => import("@/views/forum/index.vue"),
-  //       meta: {
-  //         title: "论坛管理",
-  //         hidden: true,
-  //         icon: "User",
-  //       },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: "/setting",
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: "personal",
-  //       component: () => import("@/views/setting/personal/index.vue"),
-  //       name: "personal",
-  //       meta: {
-  //         title: "个人信息",
-  //         hidden: false,
-  //         icon: "User",
-  //       },
-  //     },
-  //   ],
-  // },
-  {
     path: "/login",
     component: () => import("@/views/login/index.vue"),
     meta: {
       title: "登录/注册",
       hidden: true,
     },
-    // children: [
-    //   {
-    //     path: "",
-    //     component: () => import("@/views/login/Login/Login.vue"),
-    //     name: "login",
-    //   },
-    //   {
-    //     path: "/register",
-    //     component: () => import("@/views/login/Register/Register.vue"),
-    //     name: "register",
-    //   },
-    // ],
   },
 ];

@@ -36,11 +36,11 @@ import MenuBar from "@/layout/menu/MenuBar.vue";
 }
 
 .asside {
-  background: linear-gradient(180deg, #292524 0%, #44403c 100%);
+  background: linear-gradient(180deg, #1c1917 0%, #292524 100%);
   min-height: 665px;
-  padding: 10px;
+  padding: 8px;
   border-radius: 16px;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.15);
 }
 
 .header {

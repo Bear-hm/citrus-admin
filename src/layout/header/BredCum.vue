@@ -203,11 +203,12 @@ const handleCommand = (command) => {
 .user-menu__trigger {
   font-size: 20px;
   color: var(--text-secondary, #6b7280);
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .user-menu__trigger:hover {
   color: var(--color-primary-hover, #ea580c);
+  transform: rotate(45deg);
 }
 
 .header-bar__crumb :deep(.el-breadcrumb__item:last-child .el-breadcrumb__inner) {
