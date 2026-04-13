@@ -178,6 +178,14 @@ const props = defineProps({
     type: Array,
     default: () => [10, 20, 30, 40],
   },
+  currentPage: {
+    type: Number,
+    default: 1,
+  },
+  pageSize: {
+    type: Number,
+    default: 10,
+  },
 });
 
 const emit = defineEmits([
@@ -194,8 +202,6 @@ const emit = defineEmits([
 // 数据
 const tableData = ref([]);
 const total = ref(0);
-const currentPage = ref(1);
-const pageSize = ref(10);
 const searchValue = ref("");
 const dialogVisible = ref(false);
 const isEdit = ref(false);

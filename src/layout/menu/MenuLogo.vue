@@ -1,7 +1,7 @@
 <template>
   <div class="logo" @click="goHome">
     <img :src="logo" alt="logo" />
-    <span v-if="!isCollapse" class="title">智慧柑橘管理平台</span>
+    <span v-if="!isCollapse" class="title">{{ APP_CONFIG.sidebarTitle }}</span>
   </div>
 </template>
 <script setup lang="ts">
@@ -9,6 +9,7 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "@/store/index";
 import logo from "@/assets/logo.png";
+import { APP_CONFIG } from "@/config";
 const store = useStore();
 const router = useRouter();
 const isCollapse = computed(() => {

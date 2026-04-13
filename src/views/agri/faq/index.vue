@@ -14,6 +14,15 @@ const getRoleLabel = (roleCode: string) => {
   return roleMap[roleCode] || { label: "通用", type: "info" };
 };
 
+const statusMap: Record<number, { label: string; type: string }> = {
+  1: { label: "启用", type: "success" },
+  0: { label: "禁用", type: "danger" },
+};
+
+const getStatusLabel = (status: number) => {
+  return statusMap[status] || { label: "未知", type: "info" };
+};
+
 // 分页
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -49,6 +58,12 @@ const tableColumns = [
     width: 100,
     formatter: (row: FaqVO) => getRoleLabel(row.roleCode).label,
   },
+  {
+    prop: "status",
+    label: "状态",
+    width: 80,
+    formatter: (row: FaqVO) => getStatusLabel(row.status ?? 1).label,
+  },
   { prop: "sortOrder", label: "排序", width: 80 },
 ];
 
@@ -64,6 +79,15 @@ const formColumns = [
       { label: "通用", value: "" },
       { label: "农户", value: "farmer" },
       { label: "批发商", value: "wholesaler" },
+    ],
+  },
+  {
+    prop: "status",
+    label: "状态",
+    type: "select",
+    options: [
+      { label: "启用", value: 1 },
+      { label: "禁用", value: 0 },
     ],
   },
   { prop: "sortOrder", label: "排序", type: "number", min: 0 },
@@ -83,7 +107,7 @@ const getTableData = async (page = 1) => {
   const params: FaqPageParams = {
     pageNum: currentPage.value,
     pageSize: pageSize.value,
-    keyword: queryParam.value || undefined,
+    search: queryParam.value || undefined,
     roleCode: roleCodeSelected.value || undefined,
   };
 
@@ -231,6 +255,11 @@ onMounted(() => {
         <template v-if="item.prop === 'roleCode'" #default="{ row }">
           <el-tag :type="getRoleLabel(row.roleCode).type">
             {{ getRoleLabel(row.roleCode).label }}
+          </el-tag>
+        </template>
+        <template v-else-if="item.prop === 'status'" #default="{ row }">
+          <el-tag :type="getStatusLabel(row.status ?? 1).type">
+            {{ getStatusLabel(row.status ?? 1).label }}
           </el-tag>
         </template>
       </el-table-column>

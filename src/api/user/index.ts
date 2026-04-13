@@ -2,14 +2,14 @@ import request from "@/utils/request";
 import type { ResponseData } from "@/api/type";
 
 enum API {
-  LOGIN_URL = "/login",
-  LOGOUT_URL = "/api/user/logout",
-  UPDATE_URL = "/api/user",
-  USER_ADD = "/api/user/register",
-  USER_GET_BY_ID = "/api/user/info",
-  USER_PAGE = "/api/user/page",
-  USER_DELETE_BY_ID = "/api/user/{id}",
-  USER_REGISTER = "/api/user/register",
+  LOGIN_URL = "user/login",
+  LOGOUT_URL = "/user/logout",
+  UPDATE_URL = "/user",
+  USER_ADD = "/user/register",
+  USER_GET_BY_ID = "/user/info",
+  USER_PAGE = "/user/page",
+  USER_DELETE_BY_ID = "/user/{id}",
+  USER_REGISTER = "/user/register",
 }
 
 /**
@@ -19,12 +19,9 @@ export function reqLogin(data: { username: string; password: string }) {
   return request<ResponseData>({
     url: API.LOGIN_URL,
     method: "post",
-    params: {
+    data: {
       username: data.username,
       password: data.password,
-    },
-    headers: {
-      userType: 4,
     },
   });
 }

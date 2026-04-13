@@ -8,6 +8,7 @@ export const constantRoute = [
       hidden: true,
     },
   },
+  //工作台
   {
     path: "/",
     component: Layout,
@@ -56,15 +57,6 @@ export const constantRoute = [
       icon: "Sunny",
     },
     children: [
-      {
-        path: "weather",
-        component: () => import("@/views/agri/weather/index.vue"),
-        name: "weather",
-        meta: {
-          title: "天气管理",
-          hidden: false,
-        },
-      },
       {
         path: "faq",
         component: () => import("@/views/agri/faq/index.vue"),

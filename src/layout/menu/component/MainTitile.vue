@@ -3,13 +3,15 @@
     <el-icon><Watermelon /></el-icon>
     <el-icon><Pear /></el-icon>
     <el-icon><Orange /></el-icon>
-    <div class="title-text">智慧柑橘后台</div>
+    <div class="title-text">{{ APP_CONFIG.homeTitle }}</div>
     <el-icon><Pear /></el-icon>
     <el-icon><Orange /></el-icon>
     <el-icon><Watermelon /></el-icon>
   </div>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { APP_CONFIG } from "@/config";
+</script>
 <style lang="scss">
 .home-title {
   color: $mainColor;

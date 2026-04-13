@@ -3,7 +3,7 @@ import type { ResponseData } from "@/api/type";
 
 // 接口枚举
 enum API {
-  WEATHER_INFO = "/api/home/weather",
+  WEATHER_INFO = "/home/weather",
 }
 
 /**

@@ -7,7 +7,6 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import axios from "axios";
-import { ElMessage } from "element-plus";
 const request = axios.create({
   baseURL: 'http://localhost:8080/api',
   timeout: 60000, // 请求超时时间
@@ -18,13 +17,11 @@ const errorHandler = (error: any) => {
   if (error.response) {
     switch (error.response.status) {
       case 401:
-        // 登录过期错误处理
         break;
       case 500:
-        // 服务器错误处理
         break;
       default:
-        ElMessage.error(`${error}`);
+        break;
     }
   }
   return Promise.reject(error);
@@ -34,11 +31,11 @@ const errorHandler = (error: any) => {
 request.interceptors.request.use((config) => {
   /**
    * 如果token 存在，则给请求头加token
+   * 使用标准的 Authorization Bearer 格式
    */
-  // eslint-disable-next-line no-undef
   const token = sessionStorage.getItem("token");
   if (token) {
-    config.headers.token = `${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 }, errorHandler);

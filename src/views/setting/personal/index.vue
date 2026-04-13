@@ -1,40 +1,38 @@
-<script setup>
+<script setup lang="ts">
 // import avatarImg from '@/assets/images/user/avatar.jpg'
-import Cookies from "js-cookie";
 import { reqUpdateUser, reqGetUserById } from "@/api/user/index";
 import { reqUploadFile, reqDownloadFileById } from "@/api/file/index";
 
 import { ref, onMounted, computed } from "vue";
 import { ElMessage } from "element-plus";
+import { useUserStore } from "@/store/user";
+
 const uploadRef = ref();
-let userInfo = ref({});
+const userStore = useUserStore();
+const userInfo = ref<any>({});
 
 const userTypeLabel = computed(() => {
   const typeMap = {
-    1: "普通用户",
-    2: "专家",
-    3: "管理员",
-    4: "超级管理员",
+    farmer: "农户",
+    wholesaler: "采购商",
+    admin: "管理员",
   };
-  return typeMap[userInfo.value.userType] || "未知类型";
+  return typeMap[userInfo.value.userType] || userInfo.value.userType || "未知";
 });
+
 const saveUserInfo = async () => {
-  // console.log(userInfo.value);
   const formData = {
     id: userInfo.value.id,
-    userName: userInfo.value.userName,
+    username: userInfo.value.username,
     name: userInfo.value.name,
-    mobile: userInfo.value.mobile,
+    phone: userInfo.value.phone,
     email: userInfo.value.email,
     avatar: userInfo.value.avatar,
   };
   const res = await reqUpdateUser(formData);
-  if (res.code === "200") {
+  if (res.code === 200) {
     ElMessage.success("保存成功");
-    // 更新cookie
-    Cookies.set("user", encodeURIComponent(JSON.stringify(userInfo.value)), {
-      expires: 7,
-    });
+    userStore.updateUserInfo(userInfo.value);
   } else {
     ElMessage.error("更新失败");
   }
@@ -93,7 +91,7 @@ const beforeAvatarUpload = (file) => {
 const uploadAvatar = async (param) => {
   const file = param.file;
   const res = await reqUploadFile(file);
-  if (res.code === "200") {
+  if (res.code === 200) {
     removeAvatar();
     avatarUrl.value = await getAvatarUrl(res.data.id);
 
@@ -106,17 +104,16 @@ const uploadAvatar = async (param) => {
 };
 
 const loadUserInfo = async () => {
-  const userCookie = Cookies.get("user");
-  if (userCookie) {
-    const cookieUser = JSON.parse(decodeURIComponent(userCookie));
-    const res = await reqGetUserById(cookieUser.id);
-    if (res.code === "200") {
+  if (userStore.userId) {
+    const res = await reqGetUserById();
+    if (res.code === 200) {
       const raw = res.data;
       userInfo.value = {
         ...raw,
-        createDate: formatDate(raw.createDate),
-        updateDate: formatDate(raw.updateDate),
+        createdAt: formatDate(raw.createdAt),
+        updatedAt: formatDate(raw.updatedAt),
       };
+      userStore.updateUserInfo(raw);
       avatarUrl.value = await getAvatarUrl(raw.avatar);
     } else {
       ElMessage.error("获取用户信息失败");
@@ -165,15 +162,9 @@ onMounted(() => {
         <el-form label-width="120px" class="user-form">
           <el-form-item label="账号">
             <el-input
-              v-model="userInfo.account"
+              v-model="userInfo.username"
               placeholder="请输入账户"
               disabled
-            ></el-input>
-          </el-form-item>
-          <el-form-item label="用户名">
-            <el-input
-              v-model="userInfo.userName"
-              placeholder="请输入用户名"
             ></el-input>
           </el-form-item>
           <el-form-item label="真实姓名">
@@ -190,7 +181,7 @@ onMounted(() => {
           </el-form-item> -->
           <el-form-item label="手机号">
             <el-input
-              v-model="userInfo.mobile"
+              v-model="userInfo.phone"
               placeholder="请输入手机号"
             ></el-input>
           </el-form-item>
@@ -204,10 +195,10 @@ onMounted(() => {
             <el-tag :closable="false">{{ userTypeLabel }}</el-tag>
           </el-form-item>
           <el-form-item label="创建时间">
-            <el-input v-model="userInfo.createDate" :disabled="true"></el-input>
+            <el-input v-model="userInfo.createdAt" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="最新更新时间">
-            <el-input v-model="userInfo.updateDate" :disabled="true"></el-input>
+            <el-input v-model="userInfo.updatedAt" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="saveUserInfo">保存</el-button>

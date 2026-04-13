@@ -11,7 +11,7 @@ const getWeather = async () => {
   loading.value = true;
   try {
     const res = await reqGetWeather();
-    if (res.code === "200") {
+    if (res.code === 200) {
       weatherData.value = res.data;
     } else {
       ElMessage.error(res.message || "获取天气信息失败");

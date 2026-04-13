@@ -116,13 +116,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ElMessage } from "element-plus";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import Vcode from "vue3-puzzle-vcode";
-import { useUser } from "../../../store/user";
-const registerStore = useUser();
+// import { useUser } from "../../../store/user";
+// const registerStore = useUser();
 
 const radio1 = ref("1");
 const radio2 = ref("1");
@@ -207,7 +207,7 @@ const submitForm = (formEl) => {
 
   if (!formEl) return;
   if (flag == 1) {
-    registerStore.signUp(ruleForm);
+    // registerStore.signUp(ruleForm);
     formEl.validate((valid) => {
       if (valid) {
         ElMessage.success("注册成功");
@@ -226,40 +226,76 @@ const submitForm = (formEl) => {
 </script>
 
 <style lang="scss" scoped>
-@use "../Login.scss";
+.register {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
+
+  h1 {
+    font-size: 28px;
+    color: rgb(45, 50, 80);
+    margin-bottom: 8px;
+  }
+
+  h4 {
+    font-size: 14px;
+    color: rgb(100, 108, 154);
+    font-weight: normal;
+  }
+}
+
+.form {
+  width: 100%;
+  max-width: 350px;
+}
+
 .userName,
 .password,
 .checkPassword,
-.location,
 .phone,
-.idCard {
-  height: 4.7vh;
-  border-color: rgb(66, 71, 105);
-  margin-bottom: 3%;
-}
+.idCard,
 .location {
-  margin-bottom: 1%;
+  margin-bottom: 12px;
 }
-.box .forms .login .form,
-.box .forms .register .form {
-  margin-top: 1.5vw;
+
+.other-select {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
 }
-.gender,
-.role {
+
+.gender {
+  margin-bottom: 15px;
+}
+
+.btn {
   width: 100%;
-  .radio {
-    margin-right: 10%;
+  height: 45px;
+  background-color: rgb(249, 177, 122);
+  border: none;
+  color: rgb(45, 50, 80);
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 15px rgba(249, 177, 122, 0.5);
+    transform: translateY(-2px);
   }
 }
-:deep(.el-input__wrapper) {
-  font-size: 16px;
-}
-.box .forms .register .form .btn {
-  margin-top: 1vw;
-}
+
 :deep(.el-radio__input.is-checked + .el-radio__label) {
   color: rgb(249, 177, 122);
 }
+
 :deep(.el-radio__input.is-checked .el-radio__inner) {
   background: rgb(249, 177, 122);
   border-color: rgb(249, 177, 122);

@@ -19,9 +19,9 @@
       </div>
     </div>
     <div class="header-bar__user">
-      <img class="avatar" :src="userInfo.userImage" alt="" />
+      <img class="avatar" :src="userStore.userAvatar" alt="" />
       <div class="user-detail">
-        <span class="user-name">{{ userInfo.username }}</span>
+        <span class="user-name">{{ userStore.userName || "未登录" }}</span>
         <el-dropdown class="user-menu" @command="handleCommand">
           <el-icon class="user-menu__trigger"><Tools /></el-icon>
           <template #dropdown>
@@ -40,16 +40,11 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { reqLogout } from "@/api/user/index";
 import SimpleCalendar from "@/components/SimpleCalendar.vue";
 import { ElMessage } from "element-plus";
-import Cookies from "js-cookie";
+import { useUserStore } from "@/store/user";
 
-const userInfo = {
-  username: "管理员",
-  userImage:
-    "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-};
+const userStore = useUserStore();
 
 onMounted(() => {});
 
@@ -68,14 +63,13 @@ watch(
 );
 
 const logout = async () => {
-  const res = await reqLogout();
-  if (res.code === "200") {
-    ElMessage({
-      type: "success",
-      message: "退出登录成功",
-    });
-    Cookies.remove("auth_token");
-    router.push("/login");
+  try {
+    await userStore.logout();
+    ElMessage.success("退出登录成功");
+    router.replace("/login");
+  } catch {
+    userStore.logout();
+    router.replace("/login");
   }
 };
 

@@ -5,6 +5,8 @@
     :table-columns="tableColumns"
     add-button-text="新增用户"
     search-placeholder="请输入用户名称"
+    :current-page="currentPage"
+    :page-size="pageSize"
     @add="handleAdd"
     @edit="handleEdit"
     @delete="handleDelete"
@@ -45,7 +47,7 @@
         >
           <el-input
             v-model="formData[item.prop]"
-            :disabled="isEdit && ['account', 'createDate'].includes(item.prop)"
+            :disabled="isEdit && ['username', 'createdAt'].includes(item.prop)"
           />
         </el-form-item>
         <!-- <el-form-item
@@ -74,21 +76,20 @@ const pageSize = ref(10);
 // 表格列定义
 const tableColumns = [
   { prop: "avatar", label: "头像", formType: "upload", columnType: "image" },
-  { prop: "userName", label: "用户名", formType: "input" },
-  { prop: "account", label: "账号", formType: "input" },
+  { prop: "username", label: "账号", formType: "input" },
+  { prop: "name", label: "姓名", formType: "input" },
+  { prop: "phone", label: "手机号", formType: "input" },
   { prop: "email", label: "邮箱", formType: "input" },
-  { prop: "mobile", label: "手机号", formType: "input" },
-  { prop: "createDate", label: "创建时间", formType: "none" },
+  { prop: "createdAt", label: "创建时间", formType: "none" },
   {
     prop: "userType",
     label: "用户类型",
     formType: "tag",
     columnType: "tag",
     typeMap: {
-      1: { label: "普通用户", type: "info" },
-      2: { label: "专家", type: "warning" },
-      3: { label: "管理员", type: "success" },
-      4: { label: "超级管理员", type: "danger" },
+      farmer: { label: "农户", type: "info" },
+      wholesaler: { label: "采购商", type: "warning" },
+      admin: { label: "管理员", type: "success" },
     },
   },
 ];
@@ -106,7 +107,7 @@ const handleEdit = (row) => {
 const handleDelete = async (row) => {
   try {
     const res = await reqDeleteUserById(row.id);
-    if (res.code === "200") {
+    if (res.code === 200) {
       ElMessage.success("删除成功");
       handleRefresh();
     } else {
@@ -156,8 +157,8 @@ const getUserList = async () => {
       pageNum: currentPage.value,
       pageSize: pageSize.value,
     });
-    if (res.code === "200") {
-      crudRef.value.setTableData(res.data.list);
+    if (res.code === 200) {
+      crudRef.value.setTableData(res.data.records);
       crudRef.value.setTotal(res.data.total);
     } else {
       ElMessage.error(res.message || "获取用户列表失败");

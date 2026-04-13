@@ -14,6 +14,8 @@ export interface FaqVO {
   roleCode: string
   /** 排序 */
   sortOrder: number
+  /** 状态 1-启用 0-禁用 */
+  status?: number
 }
 
 /** FAQ 查询参数 */
@@ -22,10 +24,12 @@ export interface FaqPageParams {
   pageNum?: number
   /** 每页数量 */
   pageSize?: number
-  /** 角色编码 */
+  /** 适用角色 */
   roleCode?: string
-  /** 搜索关键词 */
-  keyword?: string
+  /** 状态 1-启用 0-禁用 */
+  status?: number
+  /** 搜索关键词（问题/答案） */
+  search?: string
 }
 
 /** 分页响应 VO */
