@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { reqLogin, reqGetUserById } from "@/api/user/index";
+import { reqLogin, reqGetUserById, reqLogout } from "@/api/user/index";
 
 const TOKEN_KEY = "citrus_admin_token";
 const USER_INFO_KEY = "citrus_admin_userinfo";
@@ -62,6 +62,11 @@ export const useUserStore = defineStore("user", () => {
     sessionStorage.removeItem("token");
   }
 
+  // 公开的清除所有方法，供外部调用（如 request 拦截器）
+  function clearAll() {
+    _clearAll();
+  }
+
   function initFromStorage() {
     const savedToken = localStorage.getItem(TOKEN_KEY);
     const savedUserInfo = localStorage.getItem(USER_INFO_KEY);
@@ -111,6 +116,11 @@ export const useUserStore = defineStore("user", () => {
   }
 
   async function logout(): Promise<void> {
+    try {
+      await reqLogout();
+    } catch {
+      // 忽略后端错误，确保本地清理
+    }
     _clearAll();
   }
 
@@ -134,6 +144,7 @@ export const useUserStore = defineStore("user", () => {
     setLoginInfo,
     fetchUserInfo,
     logout,
+    clearAll,
     updateUserInfo,
   };
 });

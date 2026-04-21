@@ -41,7 +41,7 @@
 import { ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import SimpleCalendar from "@/components/SimpleCalendar.vue";
-import { ElMessage } from "element-plus";
+import message from "@/utils/message";
 import { useUserStore } from "@/store/user";
 
 const userStore = useUserStore();
@@ -65,7 +65,7 @@ watch(
 const logout = async () => {
   try {
     await userStore.logout();
-    ElMessage.success("退出登录成功");
+    message.success("退出登录成功");
     router.replace("/login");
   } catch {
     userStore.logout();

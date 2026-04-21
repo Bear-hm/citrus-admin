@@ -13,11 +13,14 @@ import { resolve } from "path";
 export default defineConfig({
   plugins: [vue()],
   base: "./",
-  // server: {
-  //   host: "0.0.0.0",
-  //   port: 8080,
-  //   open: true,
-  // },
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),

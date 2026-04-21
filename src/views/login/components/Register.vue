@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from "element-plus";
+import message from "@/utils/message";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import Vcode from "vue3-puzzle-vcode";
@@ -210,17 +210,17 @@ const submitForm = (formEl) => {
     // registerStore.signUp(ruleForm);
     formEl.validate((valid) => {
       if (valid) {
-        ElMessage.success("注册成功");
+        message.success("注册成功");
         router.push({
           path: "/login",
         });
       } else {
-        ElMessage.error("请确保用户名或密码是否正确");
+        message.error("请确保用户名或密码是否正确");
         return false;
       }
     });
   } else {
-    ElMessage.error("请先完成滑块验证");
+    message.error("请先完成滑块验证");
   }
 };
 </script>

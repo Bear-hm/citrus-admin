@@ -2,7 +2,7 @@ import request from "@/utils/request";
 import type { ResponseData } from "@/api/type";
 
 enum API {
-  LOGIN_URL = "user/login",
+  LOGIN_URL = "/user/login",
   LOGOUT_URL = "/user/logout",
   UPDATE_URL = "/user",
   USER_ADD = "/user/register",

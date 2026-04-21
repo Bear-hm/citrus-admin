@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { ElMessage } from "element-plus";
+import message from "@/utils/message";
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import Vcode from "vue3-puzzle-vcode";
@@ -84,7 +84,7 @@ const onClose = () => {
 const onSuccess = () => {
   isVerified.value = true;
   isShow.value = false;
-  ElMessage.success("验证成功");
+  message.success("验证成功");
 };
 
 const rules = reactive({
@@ -97,7 +97,7 @@ const rules = reactive({
 const submitForm = async (formEl) => {
   if (!formEl) return;
   if (!isVerified.value) {
-    ElMessage.error("请先完成滑块验证");
+    message.error("请先完成滑块验证");
     return;
   }
   try {
@@ -107,15 +107,15 @@ const submitForm = async (formEl) => {
       const res = await reqLogin(ruleForm);
       if (res.code === 200) {
         userStore.setLoginInfo(res.data.userVO, res.data.token);
-        ElMessage.success("登录成功，欢迎...");
+        message.success("登录成功，欢迎...");
         await router.push("/");
       } else {
-        ElMessage.error(res.message || "登录失败，请检查用户名和密码");
+        message.error(res.message || "登录失败，请检查用户名和密码");
       }
     }
   } catch (error) {
     console.error(error);
-    ElMessage.error("登录失败，请稍后重试");
+    message.error("登录失败，请稍后重试");
   } finally {
     loading.value = false;
   }

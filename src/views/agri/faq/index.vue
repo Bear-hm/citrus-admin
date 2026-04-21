@@ -2,7 +2,8 @@
 import { ref, reactive, onMounted } from "vue";
 import { reqGetFaqList, reqAddFaq, reqUpdateFaq, reqDeleteFaq } from "@/api/faq";
 import type { FaqVO, FaqPageParams } from "@/api/faq/type";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessageBox } from "element-plus"
+import message from "@/utils/message";
 import { Edit, Delete } from "@element-plus/icons-vue";
 
 const roleMap: Record<string, { label: string; type: string }> = {
@@ -124,10 +125,10 @@ const getTableData = async (page = 1) => {
         total.value = 0;
       }
     } else {
-      ElMessage.error(res.message || "获取FAQ列表失败");
+      message.error(res.message || "获取FAQ列表失败");
     }
   } catch {
-    ElMessage.error("获取FAQ列表失败");
+    message.error("获取FAQ列表失败");
   } finally {
     loading.value = false;
   }
@@ -160,21 +161,21 @@ const submit = async () => {
   if (isEdit.value) {
     const res = await reqUpdateFaq(form as Partial<FaqVO>);
     if (res.code === 200) {
-      ElMessage.success("更新成功");
+      message.success("更新成功");
       dialogVisible.value = false;
       getTableData();
     } else {
-      ElMessage.error(res.message || "更新失败");
+      message.error(res.message || "更新失败");
     }
   } else {
     const { id, ...params } = form;
     const res = await reqAddFaq(params as Partial<FaqVO>);
     if (res.code === 200) {
-      ElMessage.success("新增成功");
+      message.success("新增成功");
       dialogVisible.value = false;
       getTableData();
     } else {
-      ElMessage.error(res.message || "新增失败");
+      message.error(res.message || "新增失败");
     }
   }
 };
@@ -189,10 +190,10 @@ const deleteRow = async (id: number) => {
     });
     const res = await reqDeleteFaq(id);
     if (res.code === 200) {
-      ElMessage.success("删除成功");
+      message.success("删除成功");
       getTableData();
     } else {
-      ElMessage.error(res.message || "删除失败");
+      message.error(res.message || "删除失败");
     }
   } catch {
     // 用户取消

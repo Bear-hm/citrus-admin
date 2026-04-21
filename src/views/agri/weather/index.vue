@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { reqGetWeather } from "@/api/weather";
-import { ElMessage } from "element-plus";
+import message from "@/utils/message";
 
 const weatherData = ref(null);
 const loading = ref(false);
@@ -14,10 +14,10 @@ const getWeather = async () => {
     if (res.code === 200) {
       weatherData.value = res.data;
     } else {
-      ElMessage.error(res.message || "获取天气信息失败");
+      message.error(res.message || "获取天气信息失败");
     }
   } catch (error) {
-    ElMessage.error("获取天气信息失败");
+    message.error("获取天气信息失败");
   } finally {
     loading.value = false;
   }

@@ -73,10 +73,6 @@ $active-left-border: #f97316;
   border-radius: 8px;
   border-left: 3px solid transparent;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:nth-last-child(1) {
-    border-bottom: none;
-  }
 }
 
 // Hover 状态：左边框 + 背景微亮
@@ -97,21 +93,23 @@ $active-left-border: #f97316;
   transform: translateX(2px);
 }
 
-// 子菜单展开后的子菜单项
-:deep(.is-opened .el-menu-item) {
-  background: rgba(255, 255, 255, 0.04) !important;
+// 子菜单展开后的子菜单项容器 - 仅透明背景，不影响内部 item
+:deep(.is-opened > .el-menu--inline) {
+  background: transparent !important;
 }
 
-// 子菜单标题
+// 子菜单标题 - 与父菜单区分：字号稍小、左侧缩进
 :deep(.el-sub-menu .el-sub-menu__title) {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 14px;
   height: 44px;
   line-height: 44px;
   margin: 2px 8px;
+  padding-left: 14px !important;
   border-radius: 8px;
   border-left: 3px solid transparent;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 :deep(.el-sub-menu__title) {
@@ -140,9 +138,33 @@ $active-left-border: #f97316;
 
 :deep(.el-menu--collapse) {
   background: $menu-bg;
+  width: 64px;
 }
 
-// 弹窗菜单
+// 子菜单内的菜单项 - 缩进 + 字号更小 + 颜色更浅
+:deep(.el-sub-menu .el-menu--inline .el-menu-item) {
+  padding-left: 44px !important;
+  font-size: 13px;
+  height: 40px;
+  line-height: 40px;
+  margin: 1px 8px 1px 0;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+:deep(.el-sub-menu .el-menu--inline .el-menu-item:hover) {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-left: 3px solid rgba(249, 115, 22, 0.4);
+}
+
+:deep(.el-sub-menu .el-menu--inline .el-menu-item.is-active) {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 179, 8, 0.12) 100%) !important;
+  color: #ffffff !important;
+  border-left: 4px solid $active-left-border;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
+}
 :deep(.el-menu--popup) {
   background: #292524;
   border-radius: 10px;
@@ -175,5 +197,27 @@ $active-left-border: #f97316;
   height: 20px;
   margin-right: 10px;
   font-size: 18px;
+}
+
+// 子菜单内的图标 - 更小更轻
+:deep(.el-sub-menu .el-menu--inline .el-menu-item .el-icon) {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  font-size: 15px;
+  opacity: 0.8;
+}
+
+// 子菜单展开箭头
+:deep(.el-sub-menu .el-sub-menu__title .el-sub-menu__icon-arrow) {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+:deep(.el-menu),
+:deep(.el-menu .el-sub-menu),
+:deep(.el-menu .el-menu-item),
+:deep(.el-menu .el-sub-menu__title) {
+  backface-visibility: hidden;
 }
 </style>

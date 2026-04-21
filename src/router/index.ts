@@ -9,7 +9,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { constantRoute } from "./router";
 import { useUserStore } from "@/store/user";
-import { ElMessage } from "element-plus";
+import message from "@/utils/message";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -30,13 +30,19 @@ router.beforeEach(async (to, from, next) => {
   if (userStore.token && !userStore.userId) {
     try {
       await userStore.fetchUserInfo();
-    } catch {
-      // 获取失败，清除状态并重定向到登录页
-      userStore.logout();
-      ElMessage.error("登录已过期，请重新登录");
-      if (to.path !== "/login") {
-        next({ path: "/login" });
-        return;
+    } catch (error) {
+      const status = error?.response?.status;
+      // 只有 token 无效（401/403）时才登出重定向，其他错误（如网络问题）保持状态
+      if (status === 401 || status === 403) {
+        userStore.logout();
+        message.error("登录已过期，请重新登录");
+        if (to.path !== "/login") {
+          next({ path: "/login" });
+          return;
+        }
+      } else {
+        // 网络错误等非认证问题，不登出也不阻止访问
+        console.warn("获取用户信息失败（非认证错误）:", error);
       }
     }
   }

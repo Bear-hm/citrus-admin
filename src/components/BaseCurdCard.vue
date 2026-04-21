@@ -39,7 +39,7 @@
         >
           <template #default="scope">
             <template v-if="item.columnType === 'tag' && item.typeMap">
-              <el-tag :type="item.typeMap[scope.row[item.prop]]?.type || ''">
+              <el-tag :type="getTagType(item.typeMap[scope.row[item.prop]]?.type)">
                 {{ item.typeMap[scope.row[item.prop]]?.label || "未知" }}
               </el-tag>
             </template>
@@ -52,7 +52,7 @@
                 :height="item.height || '100'"
                 :preview-src-list="
                   scope.row[item.prop]
-                    ? [getImageUrl(scope.row[item.prop])]
+                    ? [getPreviewSrc(scope.row[item.prop])]
                     : []
                 "
                 @click="handleImagePreview(scope.row[item.prop])"
@@ -128,8 +128,8 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
-import { ElMessage } from "element-plus";
+import { ref, computed, reactive, onBeforeUnmount } from "vue";
+import message from "@/utils/message";
 import { reqDownloadFileById } from "@/api/file/index";
 import { reqUploadFile } from "@/api/file/index";
 const props = defineProps({
@@ -211,29 +211,74 @@ const dialogImageUrl = ref("");
 const dialogImgVisible = ref(false);
 const currentPreviewId = ref(null);
 const imageCache = reactive({});
+const VALID_TAG_TYPES = ["primary", "success", "info", "warning", "danger"];
+const FILE_SERVER_ORIGIN = "http://localhost:8080";
+
+const isDirectImageUrl = (value) => {
+  if (value === null || value === undefined) return false;
+  const normalized = String(value).trim();
+  return (
+    normalized.startsWith("http://") ||
+    normalized.startsWith("https://") ||
+    normalized.startsWith("blob:") ||
+    normalized.startsWith("data:") ||
+    normalized.startsWith("/")
+  );
+};
+
+const resolveDirectImageUrl = (value) => {
+  if (!isDirectImageUrl(value)) return "";
+  const normalized = String(value).trim();
+  if (normalized.startsWith("/")) {
+    return `${FILE_SERVER_ORIGIN}${normalized}`;
+  }
+  return normalized;
+};
+
+const getTagType = (type) => {
+  return VALID_TAG_TYPES.includes(type) ? type : undefined;
+};
+const failedImageIds = new Set(); // 记录加载失败的图片 ID，防止无限重试
+
 // 根据ID获取图片URL
-const getImageUrl = (id) => {
-  if (!id) return "";
-  if (imageCache[id]) return imageCache[id];
+const getImageUrl = (imageRef) => {
+  if (!imageRef) return "";
+  if (isDirectImageUrl(imageRef)) {
+    return resolveDirectImageUrl(imageRef);
+  }
+  if (imageCache[imageRef]) return imageCache[imageRef];
+  if (failedImageIds.has(imageRef)) return ""; // 已知失败的图片不再重试
   // 如果图片URL不在缓存中，异步加载并返回占位符
-  loadImageUrl(id);
+  loadImageUrl(imageRef);
   return "";
+};
+const getPreviewSrc = (imageRef) => {
+  return getImageUrl(imageRef);
 };
 // 异步加载图片URL
 const loadImageUrl = async (id) => {
+  if (imageCache[id] || failedImageIds.has(id) || isDirectImageUrl(id)) return; // 避免重复加载
   try {
     const blob = await reqDownloadFileById(id);
     const url = URL.createObjectURL(blob);
     imageCache[id] = url;
-    tableData.value = [...tableData.value];
+    failedImageIds.delete(id);
+    tableData.value = [...tableData.value]; // 触发表格重新渲染以显示图片
   } catch (error) {
-    console.error("加载图片失败:", error);
+    failedImageIds.add(id); // 标记为失败，不再重试
+    console.warn("加载图片失败:", id, error);
   }
 };
 // 处理图片预览
 const handleImagePreview = (id) => {
   if (!id) return;
   currentPreviewId.value = id;
+
+  if (isDirectImageUrl(id)) {
+    dialogImageUrl.value = resolveDirectImageUrl(id);
+    dialogImgVisible.value = true;
+    return;
+  }
 
   if (imageCache[id]) {
     dialogImageUrl.value = imageCache[id];
@@ -249,28 +294,36 @@ const loadImageForPreview = async (id) => {
     imageCache[id] = dialogImageUrl.value;
     dialogImgVisible.value = true;
   } catch (error) {
-    ElMessage.error("加载图片预览失败");
+    message.error("加载图片预览失败");
   }
 };
 const downloadImg = async () => {
   try {
     if (!currentPreviewId.value) {
-      ElMessage.warning("无法获取图片信息");
+      message.warning("无法获取图片信息");
       return;
     }
-    const blob = await reqDownloadFileById(currentPreviewId.value);
-    const downloadUrl = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = downloadUrl;
-    link.download = `${currentPreviewId.value}.jpg`;
+
+    if (isDirectImageUrl(currentPreviewId.value)) {
+      link.href = resolveDirectImageUrl(currentPreviewId.value);
+      link.download =
+        String(currentPreviewId.value).split("/").pop() || "image.jpg";
+    } else {
+      const blob = await reqDownloadFileById(currentPreviewId.value);
+      const downloadUrl = URL.createObjectURL(blob);
+      link.href = downloadUrl;
+      link.download = `${currentPreviewId.value}.jpg`;
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 0);
+    }
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(downloadUrl);
 
-    ElMessage.success("下载成功");
+    message.success("下载成功");
   } catch (error) {
-    ElMessage.error("下载失败");
+    message.error("下载失败");
   }
 };
 // 计算属性
@@ -332,6 +385,18 @@ defineExpose({
   setTotal: (value) => {
     total.value = value;
   },
+});
+
+// 组件卸载时清理所有 blob URL，防止内存泄漏
+onBeforeUnmount(() => {
+  Object.values(imageCache).forEach((url) => {
+    if (typeof url === "string" && url.startsWith("blob:")) {
+      URL.revokeObjectURL(url);
+    }
+  });
+  if (dialogImageUrl.value && dialogImageUrl.value.startsWith("blob:")) {
+    URL.revokeObjectURL(dialogImageUrl.value);
+  }
 });
 </script>
 

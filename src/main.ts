@@ -12,6 +12,7 @@ import * as Icons from "@element-plus/icons-vue";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 import AMap from "vue-amap";
 import { useUserStore } from "@/store/user";
+import message from "@/utils/message";
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -28,6 +29,8 @@ app
   .use(store, key)
   .use(ElementPlus, { locale: zhCn })
   .mount("#app");
+
+app.config.globalProperties.$msg = message;
 
 Object.keys(Icons).forEach((key) => {
   app.component(key, Icons[key as keyof typeof Icons]);

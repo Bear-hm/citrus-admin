@@ -21,7 +21,8 @@ import type {
   NewsCategoryDTO,
   PageVO,
 } from "@/api/news/type";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElMessageBox } from "element-plus"
+import message from "@/utils/message";
 import { Edit, Delete, Plus } from "@element-plus/icons-vue";
 
 // ==================== 新闻列表部分 ====================
@@ -110,10 +111,10 @@ const getNewsList = async (page = 1) => {
       tableData.value = (res.data as PageVO<NewsListVO>).records || [];
       total.value = (res.data as PageVO<NewsListVO>).total || 0;
     } else {
-      ElMessage.error(res.message || "获取新闻列表失败");
+      message.error(res.message || "获取新闻列表失败");
     }
   } catch {
-    ElMessage.error("获取新闻列表失败");
+    message.error("获取新闻列表失败");
   } finally {
     loading.value = false;
   }
@@ -180,10 +181,10 @@ const handleEdit = async (row: NewsListVO) => {
       Object.assign(form, detail);
       dialogVisible.value = true;
     } else {
-      ElMessage.error(res.message || "获取新闻详情失败");
+      message.error(res.message || "获取新闻详情失败");
     }
   } catch {
-    ElMessage.error("获取新闻详情失败");
+    message.error("获取新闻详情失败");
   } finally {
     loading.value = false;
   }
@@ -200,10 +201,10 @@ const handleDelete = async (row: NewsListVO) => {
 
     const res = await reqDeleteNews(row.id);
     if (res.code === 200) {
-      ElMessage.success("删除成功");
+      message.success("删除成功");
       getNewsList();
     } else {
-      ElMessage.error(res.message || "删除失败");
+      message.error(res.message || "删除失败");
     }
   } catch {
     // 用户取消
@@ -225,24 +226,24 @@ const submit = async () => {
     if (isEdit.value) {
       const res = await reqUpdateNews(form);
       if (res.code === 200) {
-        ElMessage.success("更新成功");
+        message.success("更新成功");
         dialogVisible.value = false;
         getNewsList();
       } else {
-        ElMessage.error(res.message || "更新失败");
+        message.error(res.message || "更新失败");
       }
     } else {
       const res = await reqSaveNews(form);
       if (res.code === 200) {
-        ElMessage.success("新增成功");
+        message.success("新增成功");
         dialogVisible.value = false;
         getNewsList();
       } else {
-        ElMessage.error(res.message || "新增失败");
+        message.error(res.message || "新增失败");
       }
     }
   } catch {
-    ElMessage.error("操作失败");
+    message.error("操作失败");
   }
 };
 
@@ -260,12 +261,12 @@ const handleCoverUpload = async (file: File) => {
     if (res.code === 200) {
       form.coverUrl = res.data;
       coverUrlList.value = [res.data];
-      ElMessage.success("封面上传成功");
+      message.success("封面上传成功");
     } else {
-      ElMessage.error(res.message || "封面上传失败");
+      message.error(res.message || "封面上传失败");
     }
   } catch {
-    ElMessage.error("封面上传失败");
+    message.error("封面上传失败");
   }
   return false;
 };
@@ -318,10 +319,10 @@ const getCategoryList = async (page = 1) => {
         (res.data as PageVO<NewsCategoryVO>).records || [];
       categoryTotal.value = (res.data as PageVO<NewsCategoryVO>).total || 0;
     } else {
-      ElMessage.error(res.message || "获取分类列表失败");
+      message.error(res.message || "获取分类列表失败");
     }
   } catch {
-    ElMessage.error("获取分类列表失败");
+    message.error("获取分类列表失败");
   } finally {
     categoryLoading.value = false;
   }
@@ -359,10 +360,10 @@ const handleDeleteCategory = async (row: NewsCategoryVO) => {
 
     const res = await reqDeleteNewsCategory(row.id);
     if (res.code === 200) {
-      ElMessage.success("删除成功");
+      message.success("删除成功");
       getCategoryList();
     } else {
-      ElMessage.error(res.message || "删除失败");
+      message.error(res.message || "删除失败");
     }
   } catch {
     // 用户取消
@@ -377,26 +378,26 @@ const submitCategory = async () => {
     if (categoryIsEdit.value) {
       const res = await reqUpdateNewsCategory(categoryForm);
       if (res.code === 200) {
-        ElMessage.success("更新成功");
+        message.success("更新成功");
         categoryDialogVisible.value = false;
         getCategoryList();
         getCategories(); // 刷新新闻页面的分类选项
       } else {
-        ElMessage.error(res.message || "更新失败");
+        message.error(res.message || "更新失败");
       }
     } else {
       const res = await reqSaveNewsCategory(categoryForm);
       if (res.code === 200) {
-        ElMessage.success("新增成功");
+        message.success("新增成功");
         categoryDialogVisible.value = false;
         getCategoryList();
         getCategories(); // 刷新新闻页面的分类选项
       } else {
-        ElMessage.error(res.message || "新增失败");
+        message.error(res.message || "新增失败");
       }
     }
   } catch {
-    ElMessage.error("操作失败");
+    message.error("操作失败");
   }
 };
 

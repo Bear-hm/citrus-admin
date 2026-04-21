@@ -3,15 +3,16 @@ import type { ResponseData } from "@/api/type";
 
 // 接口枚举
 enum API {
-  AGRI_ADVICE = "/home/advice",
+  /** 天气信息及种植建议 */
+  WEATHER = "/home/weather",
 }
 
 /**
- * 获取农事建议
+ * 获取天气信息及种植建议
  */
 export function reqGetAgriAdvice() {
   return request<ResponseData>({
-    url: API.AGRI_ADVICE,
+    url: API.WEATHER,
     method: "get",
   });
 }

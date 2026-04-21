@@ -1,4 +1,5 @@
 import Layout from "@/layout/index.vue";
+
 export const constantRoute = [
   {
     path: "/navigation",
@@ -8,7 +9,6 @@ export const constantRoute = [
       hidden: true,
     },
   },
-  //工作台
   {
     path: "/",
     component: Layout,
@@ -24,7 +24,6 @@ export const constantRoute = [
       },
     ],
   },
-  // 资讯管理模块
   {
     path: "/content",
     component: Layout,
@@ -42,19 +41,35 @@ export const constantRoute = [
         meta: {
           title: "资讯信息",
           hidden: false,
+          icon: "Reading",
         },
       },
     ],
   },
-  // 首页模块
+  {
+    path: "/market",
+    component: Layout,
+    children: [
+      {
+        path: "price",
+        component: () => import("@/views/market/index.vue"),
+        name: "marketPrice",
+        meta: {
+          title: "价格行情",
+          hidden: false,
+          icon: "TrendCharts",
+        },
+      },
+    ],
+  },
   {
     path: "/agri",
     component: Layout,
-    redirect: "/agri/weather",
+    redirect: "/agri/faq",
     meta: {
       title: "农业资讯",
       hidden: false,
-      icon: "Sunny",
+      icon: "Grape",
     },
     children: [
       {
@@ -64,18 +79,28 @@ export const constantRoute = [
         meta: {
           title: "问答管理",
           hidden: false,
+          icon: "ChatDotRound",
+        },
+      },
+      {
+        path: "supply-demand",
+        component: () => import("@/views/agri/supply-demand/index.vue"),
+        name: "supplyDemand",
+        meta: {
+          title: "供需管理",
+          hidden: false,
+          icon: "Management",
         },
       },
     ],
   },
-  // 设置
   {
     path: "/setting",
     component: Layout,
     meta: {
       title: "系统管理",
       hidden: false,
-      icon: "Sunny",
+      icon: "Setting",
     },
     children: [
       {

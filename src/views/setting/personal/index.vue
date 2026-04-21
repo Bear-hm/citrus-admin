@@ -1,127 +1,157 @@
 <script setup lang="ts">
-// import avatarImg from '@/assets/images/user/avatar.jpg'
-import { reqUpdateUser, reqGetUserById } from "@/api/user/index";
-import { reqUploadFile, reqDownloadFileById } from "@/api/file/index";
-
-import { ref, onMounted, computed } from "vue";
-import { ElMessage } from "element-plus";
+import { computed, onMounted, ref } from "vue";
+import { reqGetUserById, reqUpdateUser } from "@/api/user";
+import { reqUploadFile } from "@/api/file";
+import message from "@/utils/message";
 import { useUserStore } from "@/store/user";
 
-const uploadRef = ref();
 const userStore = useUserStore();
-const userInfo = ref<any>({});
+const saving = ref(false);
+const uploading = ref(false);
+const avatarUpload = ref();
+const userInfo = ref<any>({
+  username: "",
+  name: "",
+  phone: "",
+  email: "",
+  avatar: "",
+  createdAt: "",
+  updatedAt: "",
+});
 
 const userTypeLabel = computed(() => {
-  const typeMap = {
+  const typeMap: Record<string, string> = {
     farmer: "农户",
-    wholesaler: "采购商",
+    wholesaler: "批发商",
     admin: "管理员",
   };
+
   return typeMap[userInfo.value.userType] || userInfo.value.userType || "未知";
 });
 
-const saveUserInfo = async () => {
-  const formData = {
-    id: userInfo.value.id,
-    username: userInfo.value.username,
-    name: userInfo.value.name,
-    phone: userInfo.value.phone,
-    email: userInfo.value.email,
-    avatar: userInfo.value.avatar,
-  };
-  const res = await reqUpdateUser(formData);
-  if (res.code === 200) {
-    ElMessage.success("保存成功");
-    userStore.updateUserInfo(userInfo.value);
-  } else {
-    ElMessage.error("更新失败");
-  }
-};
+const formatDate = (value?: string) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
 
-// 时间格式化
-const formatDate = (dateStr) => {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
   const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const h = date.getHours().toString().padStart(2, "0");
-  const min = date.getMinutes().toString().padStart(2, "0");
-  const s = date.getSeconds().toString().padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  const h = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const s = String(date.getSeconds()).padStart(2, "0");
   return `${y}.${m}.${d} ${h}:${min}:${s}`;
 };
 
+const beforeAvatarUpload = (file: File) => {
+  const isImage = file.type.startsWith("image/");
+  if (!isImage) {
+    message.error("只能上传图片文件");
+    return false;
+  }
 
-//头像上传
-const avatarUrl = ref(null);
-const avatarUpload = ref(null);
-// 获取头像 URL
-const getAvatarUrl = async (fileId) => {
-  if (!fileId) return null;
+  const isLt5M = file.size / 1024 / 1024 < 5;
+  if (!isLt5M) {
+    message.error("图片大小不能超过 5MB");
+    return false;
+  }
+
+  return true;
+};
+
+const uploadAvatar = async (param: {
+  file: File;
+  onSuccess?: (response?: unknown) => void;
+  onError?: (error: Error) => void;
+}) => {
+  uploading.value = true;
+  const previousAvatar = userInfo.value.avatar;
   try {
-    const blob = await reqDownloadFileById(fileId);
-
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    return null;
+    const res = await reqUploadFile(param.file, { bizType: "avatar" });
+    const avatarUrl = res.rawData?.fileUrl || res.data;
+    if (res.code === 200 && avatarUrl) {
+      userInfo.value.avatar = avatarUrl;
+      const updateRes = await reqUpdateUser({
+        avatar: avatarUrl,
+      });
+      if (updateRes.code === 200) {
+        userStore.updateUserInfo({ avatar: avatarUrl });
+        param.onSuccess?.(res);
+        await loadUserInfo();
+      } else {
+        userInfo.value.avatar = previousAvatar;
+        message.error(updateRes.message || "头像保存失败");
+        param.onError?.(new Error(updateRes.message || "save avatar failed"));
+        return;
+      }
+      message.success("头像上传成功");
+    } else {
+      message.error(res.message || "头像上传失败");
+      param.onError?.(new Error(res.message || "upload avatar failed"));
+    }
+  } catch {
+    userInfo.value.avatar = previousAvatar;
+    param.onError?.(new Error("upload avatar failed"));
+    message.error("头像上传失败");
+  } finally {
+    uploading.value = false;
   }
 };
 
 const removeAvatar = () => {
-  userInfo.value.avatar = null;
-  avatarUrl.value = null; // 重置头像 URL
-  // 清除上传组件的文件列表
-  avatarUpload.value.clearFiles();
+  userInfo.value.avatar = "";
+  avatarUpload.value?.clearFiles?.();
 };
-// 上传前验证
-const beforeAvatarUpload = (file) => {
-  const isImage = file.type.startsWith("image/");
-  if (!isImage) {
-    ElMessage.error("只能上传图片文件");
-    return false;
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    ElMessage.error("图片大小不能超过 2MB");
-    return false;
-  }
-  return true;
-};
-// 上传头像
-const uploadAvatar = async (param) => {
-  const file = param.file;
-  const res = await reqUploadFile(file);
-  if (res.code === 200) {
-    removeAvatar();
-    avatarUrl.value = await getAvatarUrl(res.data.id);
 
-    userInfo.value.avatar = res.data.id;
+const saveUserInfo = async () => {
+  saving.value = true;
+  try {
+    const res = await reqUpdateUser({
+      name: userInfo.value.name,
+      phone: userInfo.value.phone,
+      email: userInfo.value.email,
+      avatar: userInfo.value.avatar,
+    });
 
-    ElMessage.success("头像修改成功");
-  } else {
-    ElMessage.error("头像上传失败");
+    if (res.code === 200) {
+      userStore.updateUserInfo({
+        name: userInfo.value.name,
+        mobile: userInfo.value.phone,
+        email: userInfo.value.email,
+        avatar: userInfo.value.avatar,
+      });
+      message.success("保存成功");
+    } else {
+      message.error(res.message || "保存失败");
+    }
+  } catch {
+    message.error("保存失败");
+  } finally {
+    saving.value = false;
   }
 };
 
 const loadUserInfo = async () => {
-  if (userStore.userId) {
+  try {
     const res = await reqGetUserById();
-    if (res.code === 200) {
-      const raw = res.data;
+    if (res.code === 200 && res.data) {
+      const raw = res.data as any;
       userInfo.value = {
         ...raw,
-        createdAt: formatDate(raw.createdAt),
-        updatedAt: formatDate(raw.updatedAt),
+        phone: raw.phone || raw.mobile || "",
+        avatar: raw.avatar || "",
+        createdAt: formatDate(raw.createdAt || raw.createDate),
+        updatedAt: formatDate(raw.updatedAt || raw.updateDate),
       };
       userStore.updateUserInfo(raw);
-      avatarUrl.value = await getAvatarUrl(raw.avatar);
     } else {
-      ElMessage.error("获取用户信息失败");
+      message.error(res.message || "获取用户信息失败");
     }
-  } else {
-    ElMessage.error("请登录获取用户信息");
+  } catch {
+    message.error("获取用户信息失败");
   }
 };
+
 onMounted(() => {
   loadUserInfo();
 });
@@ -129,79 +159,57 @@ onMounted(() => {
 
 <template>
   <div class="user-setting-wrap">
-    <el-row>
-      <el-col :span="6" class="avatar-col">
-        <div class="avatar-wrap">
-          <img
-            :src="avatarUrl"
-            style="
-              width: 180px;
-              height: 180px;
-              border-radius: 40px;
-              overflow: hidden;
-            "
-            class="avatar"
-          />
+    <el-row :gutter="24">
+      <el-col :span="7" class="avatar-col">
+        <div class="avatar-panel">
+          <el-avatar :size="180" :src="userInfo.avatar || undefined" class="avatar-preview">
+            {{ (userInfo.name || userInfo.username || "U").slice(0, 1) }}
+          </el-avatar>
 
-          <el-upload
-            ref="avatarUpload"
-            class="avatar-uploader"
-            :show-file-list="false"
-            :http-request="uploadAvatar"
-            :before-upload="beforeAvatarUpload"
-            :limit="1"
-            accept="image/*"
-          >
-            <template #trigger>
-              <el-button type="primary">修改头像</el-button>
-            </template>
-          </el-upload>
+          <div class="avatar-actions">
+            <el-upload
+              ref="avatarUpload"
+              class="avatar-uploader"
+              :show-file-list="false"
+              :http-request="uploadAvatar"
+              :before-upload="beforeAvatarUpload"
+              :limit="1"
+              accept="image/*"
+            >
+              <template #trigger>
+                <el-button type="primary" :loading="uploading">修改头像</el-button>
+              </template>
+            </el-upload>
+            <el-button plain @click="removeAvatar">清空头像</el-button>
+          </div>
         </div>
       </el-col>
-      <el-col :span="18">
-        <el-form label-width="120px" class="user-form">
+
+      <el-col :span="17">
+        <el-form label-width="110px" class="user-form">
           <el-form-item label="账号">
-            <el-input
-              v-model="userInfo.username"
-              placeholder="请输入账户"
-              disabled
-            ></el-input>
+            <el-input v-model="userInfo.username" disabled />
           </el-form-item>
           <el-form-item label="真实姓名">
-            <el-input
-              v-model="userInfo.name"
-              placeholder="请输入姓名"
-            ></el-input>
+            <el-input v-model="userInfo.name" placeholder="请输入真实姓名" />
           </el-form-item>
-          <!-- <el-form-item label="密码">
-            <el-input
-              v-model="userInfo.password"
-              placeholder="请输入密码"
-            ></el-input>
-          </el-form-item> -->
           <el-form-item label="手机号">
-            <el-input
-              v-model="userInfo.phone"
-              placeholder="请输入手机号"
-            ></el-input>
+            <el-input v-model="userInfo.phone" placeholder="请输入手机号" />
           </el-form-item>
           <el-form-item label="邮箱">
-            <el-input
-              v-model="userInfo.email"
-              placeholder="请输入邮箱"
-            ></el-input>
+            <el-input v-model="userInfo.email" placeholder="请输入邮箱" />
           </el-form-item>
           <el-form-item label="用户类型">
-            <el-tag :closable="false">{{ userTypeLabel }}</el-tag>
+            <el-tag>{{ userTypeLabel }}</el-tag>
           </el-form-item>
           <el-form-item label="创建时间">
-            <el-input v-model="userInfo.createdAt" :disabled="true"></el-input>
+            <el-input v-model="userInfo.createdAt" disabled />
           </el-form-item>
-          <el-form-item label="最新更新时间">
-            <el-input v-model="userInfo.updatedAt" :disabled="true"></el-input>
+          <el-form-item label="更新时间">
+            <el-input v-model="userInfo.updatedAt" disabled />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="saveUserInfo">保存</el-button>
+            <el-button type="primary" :loading="saving" @click="saveUserInfo">保存</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -211,69 +219,43 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .user-setting-wrap {
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 0 auto;
-  max-width: 1200px;
+  padding: 24px;
+}
 
-  .avatar-col {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-right: 20px;
+.avatar-col {
+  display: flex;
+  justify-content: center;
+}
 
-    .avatar-wrap {
-      text-align: center;
-    }
+.avatar-panel {
+  width: 100%;
+  padding: 28px 20px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+  border: 1px solid rgba(249, 115, 22, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
 
-    .avatar-preview {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-bottom: 15px;
-      border: 1px solid #e0e0e0;
+.avatar-preview {
+  border: 4px solid rgba(249, 115, 22, 0.14);
+  box-shadow: 0 10px 30px rgba(249, 115, 22, 0.12);
+}
 
-      .avatar {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        margin-bottom: 15px;
-      }
+.avatar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-      .avatar-actions {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: white;
-        padding: 5px 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-
-      &:hover .avatar-actions {
-        opacity: 1;
-      }
-    }
-  }
-
-  .user-form {
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-
-    .hint {
-      font-size: 12px;
-      color: #999;
-      margin-top: 5px;
-    }
-  }
+.user-form {
+  padding: 24px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
 </style>
